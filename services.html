@@ -245,14 +245,17 @@
             console.info('session2 created', data)
         }
 
-        const LigeroAPICreteSession = (serverInfo) => {
+        const LigeroAPICreteSession = (serverInfo,saveSession) => {
             let UserLogin = serverInfo.userLogin
             let Password = serverInfo.userPassword
             return fetch(`${serverInfo.url}/api/v1.0/session/create`, { 
                         method: "POST",
                         // headers: {"Content-type": "application/json; charset=UTF-8"},
                         body: JSON.stringify({ UserLogin, Password }),
-                    });
+                    })
+                .then(e => e.json())
+                .then(saveSession)
+                .catch(e => console.error(e))
         }
 
         const LigeroAPICall = (serverInfo, action, data) => {
@@ -269,17 +272,11 @@
         }
 
         if(!sessionStorage.getItem('SessionID1')) {
-            LigeroAPICreteSession(serverInfo1)
-                .then(e => e.json())
-                .then(saveSession1)
-                .catch(e => console.error(e))   
+            LigeroAPICreteSession(serverInfo1,saveSession1) 
         }
 
         if(!sessionStorage.getItem('SessionID2')) {
-            LigeroAPICreteSession(serverInfo2)
-                .then(e => e.json())
-                .then(saveSession2)
-                .catch(e => console.error(e))
+            LigeroAPICreteSession(serverInfo2,saveSession2)
         }
 
         const createServiceItem1 = (Service) => {
@@ -650,7 +647,7 @@
                 serverInfo1.url = loginConnection1URL.value
                 serverInfo1.userLogin = loginConnection1UserLogin.value
                 serverInfo1.userPassword = loginConnection1UserPassword.value
-                LigeroAPICreteSession(serverInfo1)
+                LigeroAPICreteSession(serverInfo1,saveSession1)
                 LigeroAPIGetServices(serverInfo1)
                 span.click()
             }
@@ -689,7 +686,7 @@
                 serverInfo2.url = loginConnection2URL.value
                 serverInfo2.userLogin = loginConnection2UserLogin.value
                 serverInfo2.userPassword = loginConnection2UserPassword.value
-                LigeroAPICreteSession(serverInfo2)
+                LigeroAPICreteSession(serverInfo2,saveSession2)
                 LigeroAPIGetServices(serverInfo2)
                 span.click()
             }
