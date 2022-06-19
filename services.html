@@ -644,12 +644,12 @@
             span.onclick = function() {
                 loginModal1.style.display = "none";
             }
-            testConnection.onclick = function() {
+            testConnection.onclick = async function() {
                 serverInfo1.url = loginConnection1URL.value
                 serverInfo1.userLogin = loginConnection1UserLogin.value
                 serverInfo1.userPassword = loginConnection1UserPassword.value
-                LigeroAPICreteSession(serverInfo1,saveSession1)
-                LigeroAPIGetServices(serverInfo1)
+                await LigeroAPICreteSession(serverInfo1,saveSession1)
+                await LigeroAPIGetServices(serverInfo1)
                 span.click()
             }
 
@@ -683,12 +683,12 @@
             span.onclick = function() {
                 loginModal2.style.display = "none";
             }
-            testConnection.onclick = function() {
+            testConnection.onclick = async function() {
                 serverInfo2.url = loginConnection2URL.value
                 serverInfo2.userLogin = loginConnection2UserLogin.value
                 serverInfo2.userPassword = loginConnection2UserPassword.value
-                LigeroAPICreteSession(serverInfo2,saveSession2)
-                LigeroAPIGetServices(serverInfo2)
+                await LigeroAPICreteSession(serverInfo2,saveSession2)
+                await LigeroAPIGetServices(serverInfo2)
                 span.click()
             }
 
