@@ -1,0 +1,717 @@
+<html>
+    <head>
+
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+       
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+            }
+
+            h2 {
+                font-size: 25px;
+            }
+
+            body {
+                overflow-y: hidden;
+            }
+            .ServiceList.Root {
+                display: block;
+                min-height: 30px;
+                width: 100%;
+                padding: 15px;
+            }
+            .ServiceList li {
+                padding: 10px;
+                padding-left: 45px;
+                /* margin-bottom: 1px; */
+                background: url('img/pathL.png') 5px 5px no-repeat rgb(147, 176, 214);
+            }
+
+            #ServiceList1, #ServiceList2 {
+                height: 82%;
+                overflow-y: scroll;
+            }
+
+            .ServiceList .copy {
+                /* background-color: rgb(149, 197, 185); */
+            }
+
+            .ServiceActions button {
+                display: block;
+                width: 100%;
+                padding: 5px;
+            }
+
+            .dragOver {
+                outline: 2px dotted blue;
+            }
+
+            .selected {
+                outline: 2px solid green;
+            }
+
+            /* The Modal (background) */
+            .modal {
+                display: none; /* Hidden by default */
+                position: fixed; /* Stay in place */
+                margin-bottom: -100%;
+                z-index: 1; /* Sit on top */
+                padding-top : 12%; /* Location of the box */
+                left: 0;
+                top: 0;
+                width: 100%; /* Full width */
+                height: 100%; /* Full height */
+                max-height: 100% !important; /* Full height */
+                overflow: auto; /* Enable scroll if needed */
+                background-color: rgb(0,0,0); /* Fallback color */
+                background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            }
+
+            /* Modal Content */
+            .modal-content {
+                background-color: #fefefe;
+                margin: auto;
+                padding: 50px;
+                border: 1px solid #888;
+                width: 40%;
+            }
+
+            /* The Close Button */
+            .close {
+                color: #aaaaaa;
+                float: right;
+                font-size: 28px;
+                font-weight: bold;
+            }
+
+            .close:hover,
+            .close:focus {
+                color: #000;
+                text-decoration: none;
+                cursor: pointer;
+            }
+        </style>
+    </head>
+    <body>
+        
+        <div id="Services" class="row">
+            <div class="col s5">
+                <nav class="navbar navbar-dark default-color">
+                    <ul id="Menu1Actions" class="navbar-nav mr-auto">
+                        <li class="navbar-item"><a href="#" class="navbar-link" onclick="connectionModal1(serverInfo1)"> Conectar </a></li>
+                        <li class="navbar-item"><a href="#" class="navbar-link" onclick="sortList(ServiceList1)"> Ordenar </a></li>
+                        <li class="navbar-item"><a href="#" class="navbar-link" onclick="cleanCache(serverInfo1)"> Limpar cache </a></li>
+                    </ul> 
+                </nav>
+                <h2 id="ServiceList1URL"></h2>
+                <ul id="ServiceList1" class="ServiceList Root">
+                </ul> 
+            </div>
+            <div class="col s1 ServiceActions">
+                <!-- <nav class="navbar flex-column nav-pills" aria-orientation="vertical"> -->
+                    <ul id="MenuActions">
+                        <li class="navbar-item"><a href="#" class="navbar-link" onclick="getAllServices()" />Get Services</a></li>
+                        <li class="navbar-item"><a href="#" class="navbar-link" onclick="copyTo2(event)"> >> copiar </a></li>
+                        <li class="navbar-item"><a href="#" class="navbar-link" onclick="copyTo1(event)"> << copiar </a></li>
+                    </ul> 
+                <!-- </nav> -->
+            </div>
+            <div class="col s5">    
+                <nav class="navbar navbar-dark default-color">
+                    <ul id="Menu2Actions">
+                        <li class="navbar-item"><a href="#" class="navbar-link" onclick="connectionModal2(serverInfo2)"> Conectar </a></li>
+                        <li class="navbar-item"><a href="#" class="navbar-link" onclick="sortList(ServiceList2)"> Ordenar </a></li>
+                        <li class="navbar-item"><a href="#" class="navbar-link" onclick="cleanCache(serverInfo2)"> Limpar cache </a></li>
+                    </ul> 
+                </nav>
+                <h2 id="ServiceList2URL"></h2>
+                <ul id="ServiceList2" class="ServiceList Root">
+                </ul> 
+            </div>
+        </div>
+
+    <!-- The Login Modal -->
+    <div id="myModal" class="modal">
+
+        <!-- Modal content -->
+        <div class="modal-content">
+        <span class="close">&times;</span>
+        <form onsubmit="return false" action="" method="POST">
+            <div>
+                URL: <input type="text" name="url"/>
+                Usuário: <input type="text" name="user"/>
+                Senha: <input type="text" name="password"/>
+                <button class="testConnection">Conectar</button>
+            </div>
+        </form>
+        </div>
+    
+    </div>
+
+
+
+    <!-- The Login Modal -->
+    <div id="loginModal1" class="modal">
+
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Service List 1</h2>
+            <form id="formConnection1" onsubmit="return false" action="" method="POST">
+                <div>
+                    URL: <input type="text" name="url" id="loginConnection1URL" />
+                    Usuário: <input type="text" name="user" id="loginConnection1UserLogin" />
+                    Senha: <input type="password" name="password" id="loginConnection1UserPassword" />
+                    <button class="testConnection">Conectar</button>
+                </div>
+            </form>
+        </div>
+    
+    </div>
+
+    <!-- The Login Modal -->
+    <div id="loginModal2" class="modal">
+
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Service List 2</h2>
+            <form id="formConnection2" onsubmit="return false" action="" method="POST">
+                <div>
+                    URL: <input type="text" name="url" id="loginConnection2URL" />
+                    Usuário: <input type="text" name="user" id="loginConnection2UserLogin" />
+                    Senha: <input type="password" name="password" id="loginConnection2UserPassword" />
+                    <button class="testConnection">Conectar</button>
+                </div>
+            </form>
+        </div>
+    
+    </div>
+    
+    </body>
+    <script>
+
+        var serverInfo1 = {
+            id: 1,
+            url: "",
+            userLogin: "root@localhost",
+            userPassword: "ligero",
+            FillServiceList: (data) => {
+                if(data.Error) {
+                    console.error(data.Error)
+                    if(data.Error.ErrorCode == "TicketCreate.AuthFail") {
+                        sessionStorage.removeItem(`SessionID1`)
+                    }
+                }
+                data.Result[0].forEach(createServiceItem1)
+            }
+        }
+
+        var serverInfo2 = {
+            id: 2,
+            url: "",
+            userLogin: "root@localhost",
+            userPassword: "ligero",
+            FillServiceList: (data) => {
+                if(data.Error) {
+                    console.error(data.Error)
+                    if(data.Error.ErrorCode == "TicketCreate.AuthFail") {
+                        sessionStorage.removeItem(`SessionID2`)
+                    }
+                }
+                data.Result[0].forEach(createServiceItem2)
+            }
+        }
+
+
+        const saveSession1 = (data) => {
+            let { SessionID, UserID } = data
+            sessionStorage.setItem(`SessionID1`, SessionID)
+            sessionStorage.setItem(`UserID1`, UserID)
+            console.info('session1 created', data)
+        }
+
+        const saveSession2 = (data) => {
+            let { SessionID, UserID } = data
+            sessionStorage.setItem(`SessionID2`, SessionID)
+            sessionStorage.setItem(`UserID2`, UserID)
+            console.info('session2 created', data)
+        }
+
+        const LigeroAPICreteSession = (serverInfo) => {
+            let UserLogin = serverInfo.userLogin
+            let Password = serverInfo.userPassword
+            return fetch(`${serverInfo.url}/api/v1.0/session/create`, { 
+                        method: "POST",
+                        // headers: {"Content-type": "application/json; charset=UTF-8"},
+                        body: JSON.stringify({ UserLogin, Password }),
+                    });
+        }
+
+        const LigeroAPICall = (serverInfo, action, data) => {
+            let field = `SessionID${serverInfo.id}`
+            if(!data['SessionID']) {
+                data['SessionID'] = sessionStorage.getItem(field)
+            }
+            return fetch(`${serverInfo.url}${action}`, { 
+                        method: "POST",
+                        // headers: {"Content-type": "application/json; charset=UTF-8"}, // CORS header error
+                        body: JSON.stringify(data),
+                    })
+                    .then(e => e.json());
+        }
+
+        if(!sessionStorage.getItem('SessionID1')) {
+            LigeroAPICreteSession(serverInfo1)
+                .then(e => e.json())
+                .then(saveSession1)
+                .catch(e => console.error(e))   
+        }
+
+        if(!sessionStorage.getItem('SessionID2')) {
+            LigeroAPICreteSession(serverInfo2)
+                .then(e => e.json())
+                .then(saveSession2)
+                .catch(e => console.error(e))
+        }
+
+        const createServiceItem1 = (Service) => {
+            let id = `ServiceList1Service${Service.ServiceID}`
+            if(window[id]) return window[id]
+            let li = document.createElement('li')
+            li.id = id
+            let ulChildService = document.createElement('ul')
+            ulChildService.classList.add(`ChildService`)
+            ulChildService.classList.add(`ChildService${Service.ServiceID}`)
+            ulChildService.id = `ServiceList1ChildService${Service.ServiceID}`
+            // li.innerHTML = JSON.stringify(Service)
+            for (var key in Service) {
+                li.dataset[key] = Service[key]
+            }
+            li.dataset.dataFrom = 'ServiceList1'
+            li.innerHTML = Service.NameShort
+            // li.title = Service.Name
+            li.draggable = true
+            if(Service.ParentID) {
+                li.classList.add(`ChildService`)
+                li.classList.add(`ParentService${Service.ParentID}`)
+            } else {
+                li.classList.add('RootService')
+            }
+            li.addEventListener('dragstart', ServiceDragStart)
+            li.addEventListener('dragover', ServiceDragOver)
+            li.addEventListener('dragleave', ServiceDragLeave)
+            li.addEventListener('drop', ServiceDrop)
+            li.addEventListener('dblclick', ShowService)
+            li.addEventListener('click', ToggleSelectService)
+            li.append(ulChildService)
+            let parentServiceList = document.querySelector(`#ServiceList1 .ChildService${Service.ParentID}`)
+            if(parentServiceList) {
+                parentServiceList.append(li)
+            } else {
+                ServiceList1.append(li)
+            }
+            return li
+        }
+
+        const createServiceItem2 = (Service) => {
+            let id = `ServiceList2Service${Service.ServiceID}`
+            if(window[id]) return window[id]
+            let li = document.createElement('li')
+            li.id = id
+            let ulChildService = document.createElement('ul')
+            ulChildService.classList.add(`ChildService`)
+            ulChildService.classList.add(`ChildService${Service.ServiceID}`)
+            ulChildService.id = `ServiceList2ChildService${Service.ServiceID}`
+            li.id = id
+            for (var key in Service) {
+                li.dataset[key] = Service[key]
+            }
+            li.dataset.dataFrom = 'ServiceList2'
+            li.innerHTML = Service.NameShort
+            // li.innerHTML = Service.Name
+            li.draggable = true
+            if(Service.ParentID) {
+                li.classList.add(`ChildService`)
+                li.classList.add(`ParentService${Service.ParentID}`)
+            } else {
+                li.classList.add('RootService')
+            }
+            li.addEventListener('dragstart', ServiceDragStart)
+            li.addEventListener('dragover', ServiceDragOver)
+            li.addEventListener('dragleave', ServiceDragLeave)
+            li.addEventListener('drop', ServiceDrop)
+            li.addEventListener('dblclick', ShowService)
+            li.addEventListener('click', ToggleSelectService)
+            li.append(ulChildService)
+            let parentServiceList = document.querySelector(`#ServiceList2 .ChildService${Service.ParentID}`)
+            if(parentServiceList) {
+                parentServiceList.append(li)
+            } else {
+                ServiceList2.append(li)
+            }
+            return li
+        }
+
+        const saveService = (serverInfo, obj) => {
+
+            let Service = Object.assign({}, obj.dataset)
+
+            //mandatory fields
+            Service.TypeID = 1
+            Service.UserID = sessionStorage.getItem(`UserID${serverInfo.id}`)
+            if(!Service.ParentID) {
+                Service.ParentID = 0;
+            }
+            let ServiceNameArray = Service.Name.split('::')
+            Service.Name = ServiceNameArray.pop()
+            
+            return LigeroAPICall(serverInfo, '/api/v1.0/admin', {
+                Object: 'Service',
+                Method: 'ServiceAdd',
+                ReturnType: "ARRAY",
+                Params: Service,
+            })
+        }
+
+        const updateService = (serverInfo, obj) => {
+
+            let Service = Object.assign({}, obj.dataset)
+
+            //mandatory fields
+            Service.TypeID = 1
+            Service.UserID = sessionStorage.getItem(`UserID${serverInfo.id}`)
+            if(!Service.ParentID) {
+                Service.ParentID = 0;
+            }
+            let ServiceNameArray = Service.Name.split('::')
+            Service.Name = ServiceNameArray.pop()
+
+            return LigeroAPICall(serverInfo, '/api/v1.0/admin', {
+                Object: 'Service',
+                Method: 'ServiceUpdate',
+                ReturnType: "ARRAY",
+                Params: Service,
+            })
+        }
+
+        const cleanCache = (serverInfo) => {
+            return LigeroAPICall(serverInfo, '/api/v1.0/admin', {
+                Object: 'Console::Command::Maint::Cache::Delete',
+                Method: 'Run',
+                ReturnType: "ARRAY",
+                Params: {
+                    UserID: sessionStorage.getItem(`UserID${serverInfo.id}`)
+                }
+            }).then(e => console.info(e))
+        }
+
+        const LigeroAPIGetServices = (serverInfo) => {
+            window[`ServiceList${serverInfo.id}URL`].innerHTML = serverInfo.url
+            return LigeroAPICall(serverInfo, '/api/v1.0/admin', {
+                Object: 'Service',
+                Method: 'ServiceListGet',
+                ReturnType: "ARRAY",
+                Params: {
+                    UserID: sessionStorage.getItem(`UserID${serverInfo.id}`)
+                }
+            }).then(serverInfo.FillServiceList)
+        }
+
+
+        const ServiceDragStart = (event) =>  {
+            dragged = event.target
+        }
+        const ServiceListDrop = (event) => {
+            event.preventDefault();
+
+            event.target.classList.remove('dragOver')
+            // liClone = dragged.cloneNode(true)
+
+            if(event.target == dragged) {
+                return false
+            }
+
+            dropList = event.target.id == 'ServiceList1' 
+                            ? event.target
+                            : event.target.querySelector(`ul.ChildService`)
+
+            dragged.dataset.ParentID = event.target.dataset.ServiceID
+            dragged.dataset.Name = event.target.dataset.Name 
+                                    ? event.target.dataset.Name + '::' + dragged.dataset.NameShort
+                                    : dragged.dataset.NameShort
+            
+
+            if(dropList) {
+                if(dropList.id == 'ServiceList1') {
+                    delete dragged.dataset.ParentID
+                }
+                if(dragged.dataset.dataFrom == 'ServiceList1') {
+
+                    updateService(serverInfo1, dragged)
+                        .then( (data) => {
+                            if(data.Error) {
+                                console.error(data.Error)
+                                if(!data.Error.match('Need Value')) {
+                                    alert(data.Error)
+                                    return false
+                                }
+                            }
+                            dragged.classList.add('copy')
+                            dropList.appendChild(dragged)
+                            sortList(dropList)
+                            dragged.scrollIntoView({block: "center", behavior: "smooth"})
+                        })
+                }
+                if(dragged.dataset.dataFrom == 'ServiceList2') {
+                    let liClone = dragged.cloneNode(true)
+                    saveService(serverInfo1, dragged)
+                        .then( (data) => {
+                            if(data.Error) {
+                                let message = `${data.Error} (${dragged.dataset.NameShort})`
+                                console.error(message)
+                                alert(message)
+                                return false
+                            }
+                            let [ id ] = data.Result
+                            liClone.id = `Service${id}`
+                            liClone.dataset.ServiceID = id
+                            liClone.addEventListener('dragstart', ServiceDragStart)
+                            liClone.addEventListener('dragover', ServiceDragOver)
+                            liClone.addEventListener('drop', ServiceDrop)
+                            dragged.classList.add('copy')
+                            liClone.classList.add('copy')
+                            dropList.appendChild(liClone)
+                            sortList(dropList)
+                            liClone.scrollIntoView({block: "center", behavior: "smooth"})
+
+                            if(copyEntireServiceTree) {
+                                dragged.querySelectorAll('.ChildService').forEach(childService => {
+                                    childService.dataset.ParentID = liClone.dataset.ServiceID
+                                    saveService(serverInfo1, childService)
+                                })
+                            }
+                        })
+
+                }
+
+            }
+            return true
+        }
+
+        const ServiceDrop = (event) => {
+            event.preventDefault();
+            // event.target.before(dragged)
+            return false
+        }
+
+        const ServiceListDragOver = (event) => {
+            event.target.classList.add('dragOver')
+            event.preventDefault();
+        }
+
+        const ServiceListDragLeave = (event) => {
+            event.preventDefault();
+            event.target.classList.remove('dragOver')
+        }
+
+        const ServiceDragOver = (event) => {
+            event.preventDefault();
+            event.target.classList.add('dragOver')
+        }
+
+        const ServiceDragLeave = (event) => {
+            event.preventDefault();
+            event.target.classList.remove('dragOver')
+        }
+
+
+        function sortList(element) {
+            var list, i, switching, b, shouldSwitch;
+            list = element;
+            switching = true;
+            /* Make a loop that will continue until
+            no switching has been done: */
+            while (switching) {
+                // start by saying: no switching is done:
+                switching = false;
+                // b = list.querySelectorAll(`li`);
+                b = document.querySelectorAll(`#${element.id} > li`) || document.querySelectorAll(`#${element.id} ul.ChildService > li`);
+                // Loop through all list-items:
+                for (i = 0; i < (b.length - 1); i++) {
+                // start by saying there should be no switching:
+                shouldSwitch = false;
+                /* check if the next item should
+                switch place with the current item: */
+                if (b[i].innerHTML.toLowerCase() > b[i + 1].innerHTML.toLowerCase()) {
+                    /* if next item is alphabetically
+                    lower than current item, mark as a switch
+                    and break the loop: */
+                    shouldSwitch = true;
+                    break;
+                }
+                }
+                if (shouldSwitch) {
+                /* If a switch has been marked, make the switch
+                and mark the switch as done: */
+                b[i].parentNode.insertBefore(b[i + 1], b[i]);
+                switching = true;
+                }
+            }
+        }
+
+        const copyTo1 = (event) => {
+            ServiceList2.querySelectorAll('li').forEach(li => {
+                if(ServiceList1.querySelector(`#${li.id}`)) {
+                    console.error(`${li.id} already exists`)
+                    // do update
+                    return false
+                }
+                let liClone = li.cloneNode(true)
+                liClone.addEventListener('dragstart', ServiceDragStart)
+                liClone.addEventListener('dragover', ServiceDragOver)
+                liClone.addEventListener('drop', ServiceDrop)
+                li.classList.add('copy')
+                liClone.classList.add('copy')
+                ServiceList1.append(liClone)
+                sortList(ServiceList1)
+            })
+        }
+
+        const copyTo2 = (event) => {
+            ServiceList1.querySelectorAll('li').forEach(li => {
+                if(ServiceList2.querySelector(`#${li.id}`)) {
+                    console.error(`${li.id} already exists`)
+                    // do update
+                    return false
+                }
+                let liClone = li.cloneNode(true)
+                liClone.addEventListener('dragstart', ServiceDragStart)
+                liClone.addEventListener('dragover', ServiceDragOver)
+                liClone.addEventListener('drop', ServiceDrop)
+                li.classList.add('copy')
+                liClone.classList.add('copy')
+                ServiceList2.append(liClone)
+                sortList(ServiceList2)
+            })
+        }
+
+        const ShowService = (event) => {
+            alert(JSON.stringify(event.target.dataset, null, 2))
+            event.stopPropagation()
+        }
+        const ToggleSelectService = (event) => {
+            if(event.target.classList.contains('selected')) {
+                event.target.classList.remove('selected')
+            } else {
+                event.target.classList.add('selected')
+            }
+        }
+
+        let dragged = null;
+
+        ServiceList1.addEventListener('drop', ServiceListDrop)
+        ServiceList1.addEventListener('dragover', ServiceListDragOver)
+        ServiceList1.addEventListener('dragleave', ServiceListDragLeave)
+
+        ServiceList2.addEventListener('drop', ServiceListDrop)
+        ServiceList2.addEventListener('dragover', ServiceListDragOver)
+        ServiceList2.addEventListener('dragleave', ServiceListDragLeave)
+
+
+
+        // Get the modal
+        function connectionModal1(serverInfo) {
+
+            // Get the button that opens the modal
+            // var btn = document.getElementById("myBtn");
+
+            // Get the <span> element that closes the modal
+            var span = loginModal1.querySelector(".close");
+            var testConnection = loginModal1.querySelector(".testConnection");
+
+            // When the user clicks the button, open the modal 
+            // btn.onclick = function() {
+            loginModal1.style.display = "block";
+            // }
+
+            // When the user clicks on <span> (x), close the modal
+            span.onclick = function() {
+                loginModal1.style.display = "none";
+            }
+            testConnection.onclick = function() {
+                serverInfo1.url = loginConnection1URL.value
+                serverInfo1.userLogin = loginConnection1UserLogin.value
+                serverInfo1.userPassword = loginConnection1UserPassword.value
+                LigeroAPICreteSession(serverInfo1)
+                LigeroAPIGetServices(serverInfo1)
+                span.click()
+            }
+
+
+
+            // When the user clicks anywhere outside of the modal, close it
+            window.onclick = function(event) {
+                if (event.target == loginModal1) {
+                    loginModal1.style.display = "none";
+                }
+            }
+        }
+
+
+        // Get the modal
+        function connectionModal2(serverInfo) {
+
+            // Get the button that opens the modal
+            // var btn = document.getElementById("myBtn");
+
+            // Get the <span> element that closes the modal
+            var span = loginModal2.querySelector(".close");
+            var testConnection = loginModal2.querySelector(".testConnection");
+
+            // When the user clicks the button, open the modal 
+            // btn.onclick = function() {
+            loginModal2.style.display = "block";
+            // }
+
+            // When the user clicks on <span> (x), close the modal
+            span.onclick = function() {
+                loginModal2.style.display = "none";
+            }
+            testConnection.onclick = function() {
+                serverInfo2.url = loginConnection2URL.value
+                serverInfo2.userLogin = loginConnection2UserLogin.value
+                serverInfo2.userPassword = loginConnection2UserPassword.value
+                LigeroAPICreteSession(serverInfo2)
+                LigeroAPIGetServices(serverInfo2)
+                span.click()
+            }
+
+
+
+            // When the user clicks anywhere outside of the modal, close it
+            window.onclick = function(event) {
+                if (event.target == loginModal2) {
+                    loginModal2.style.display = "none";
+                }
+            }
+        }
+
+        const getAllServices = () => {
+            ServiceList1.innerHTML = ''
+            ServiceList2.innerHTML = ''
+            LigeroAPIGetServices(serverInfo1)
+            LigeroAPIGetServices(serverInfo2)
+        }
+
+        window.addEventListener('load',() => getAllServices)
+
+    </script>
+</html>

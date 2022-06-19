@@ -1,0 +1,90 @@
+<html>
+    <head>
+
+    </head>
+    <body>
+        <button onclick="LigeroAPIGetTickets()" />Get Tickets</button>
+        <ul id="TicketList">
+        </ul>
+        <ul id="ServiceList">
+        </ul>
+    </body>
+    <script>
+        var server = "https://server1.example.com";
+        var UserLogin = "root@localhost"
+        var Password = "ligero"
+
+
+        const saveSession = (data) => {
+            let { SessionID, UserID } = data
+            sessionStorage.setItem('SessionID', SessionID)
+            sessionStorage.setItem('UserID', UserID)
+            console.log('session created',data)
+        }
+
+        const LigeroAPICreteSession = () => {
+            let config = { 
+                    url: `${server}/api/v1.0/session/create`, 
+                    request: { 
+                        method: "POST",
+                        // headers: {"Content-type": "application/json; charset=UTF-8"},
+                        body: JSON.stringify({ UserLogin, Password }),
+                    }
+                }
+            return fetch(config.url, config.request);
+        }
+
+        const LigeroAPICall = (action, data) => {
+            data.SessionID = sessionStorage.getItem('SessionID')
+            let config = { 
+                    url: `${server}${action}`,
+                    request: { 
+                        method: "POST",
+                        // headers: {"Content-type": "application/json; charset=UTF-8"},
+                        body: JSON.stringify(data),
+                    }
+                }
+            return fetch(config.url, config.request).then(e => e.json());
+        }
+
+        if(!sessionStorage.getItem('SessionID')) {
+            LigeroAPICreteSession()
+                .then(e => e.json())
+                .then(saveSession)
+                .catch(e => console.error(e))
+        }
+
+
+        console.log(sessionStorage.getItem('SessionID'))
+
+
+        const createTicketItem = (item) => {
+            let [ Ticket ] = item.Ticket
+            let id = `Ticket${Ticket.TicketID}`
+            if(window[id]) return window[id]
+            let li = document.createElement('li')
+            // li.innerHTML = JSON.stringify(item)
+            li.id = id
+            li.innerHTML = Ticket.Title
+            // li.innerHTML = JSON.stringify(Ticket)
+            TicketList.append(li)
+            return li
+        }
+
+        const FillTicketList = (data) => {
+            data.TicketID.forEach(LigeroAPIGetTicketByID)
+        }
+
+        const LigeroAPIGetTicketByID = (TicketID) => {
+            return LigeroAPICall('/api/v1.0/ticket/get', { TicketID })
+                .then(createTicketItem)
+        }
+
+        const LigeroAPIGetTickets = () => {
+            return LigeroAPICall('/api/v1.0/ticket/search', { Title: "*" })
+                .then(FillTicketList)
+        }
+
+
+    </script>
+</html>
