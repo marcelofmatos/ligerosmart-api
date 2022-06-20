@@ -57,6 +57,10 @@
                 outline: 2px solid green;
             }
 
+            .hasEqualIn1, .hasEqualIn2 {
+                background-color: rgb(175, 206, 198) !important;
+            }
+
             /* The Modal (background) */
             .modal {
                 display: none; /* Hidden by default */
@@ -212,6 +216,7 @@
                     }
                 }
                 data.Result[0].forEach(createServiceItem1)
+                compareServices()
             }
         }
 
@@ -228,6 +233,7 @@
                     }
                 }
                 data.Result[0].forEach(createServiceItem2)
+                compareServices()
             }
         }
 
@@ -507,6 +513,7 @@
                 }
 
             }
+            compareServices();
             return true
         }
 
@@ -715,6 +722,20 @@
             LigeroAPIGetServices(serverInfo2)
         }
 
+        const compareServices = () => {
+            document.querySelectorAll('.hasEqualIn1, .hasEqualIn2').forEach(li => {
+                li.classList.remove('hasEqualIn1', 'hasEqualIn2')
+            })
+            ServiceList1.querySelectorAll('li').forEach(li1 => {
+                ServiceList2.querySelectorAll('li').forEach(li2 => {
+                    if(li1.dataset.Name == li2.dataset.Name) {
+                        li2.classList.add('hasEqualIn1')
+                        li1.classList.add('hasEqualIn2')
+                    }
+                })
+            })
+        }
+
         window.addEventListener('load',() => {
             getAllServices()
             if(sessionStorage.getItem('SessionID1')) {
@@ -724,10 +745,12 @@
                 LigeroAPIGetServices(serverInfo2)
             }
         })
+
         ServiceList2.addEventListener('drop', (event) => {
             event.stopPropagation()
             event.preventDefault()
             alert('read-only side')
+            dragged = undefined
             return false
         })
 
