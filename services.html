@@ -212,7 +212,7 @@
                 if(data.Error) {
                     console.error(data.Error)
                     if(data.Error.ErrorCode == "TicketCreate.AuthFail") {
-                        sessionStorage.removeItem(`ServerList1SessionID`)
+                        sessionStorage.removeItem(`ServiceList1SessionID`)
                     }
                 }
                 data.Result[0].forEach(createServiceItem1)
@@ -229,7 +229,7 @@
                 if(data.Error) {
                     console.error(data.Error)
                     if(data.Error.ErrorCode == "TicketCreate.AuthFail") {
-                        sessionStorage.removeItem(`ServerList2SessionID`)
+                        sessionStorage.removeItem(`ServiceList2SessionID`)
                     }
                 }
                 data.Result[0].forEach(createServiceItem2)
@@ -240,17 +240,17 @@
 
         const saveSession1 = (data) => {
             let { SessionID, UserID } = data
-            sessionStorage.setItem(`ServerList1URL`, serverInfo1.url)
-            sessionStorage.setItem(`ServerList1SessionID`, SessionID)
-            sessionStorage.setItem(`ServerList1UserID`, UserID)
+            sessionStorage.setItem(`ServiceList1URL`, serverInfo1.url)
+            sessionStorage.setItem(`ServiceList1SessionID`, SessionID)
+            sessionStorage.setItem(`ServiceList1UserID`, UserID)
             console.info('session1 created', data)
         }
 
         const saveSession2 = (data) => {
             let { SessionID, UserID } = data
-            sessionStorage.setItem(`ServerList2URL`, serverInfo2.url)
-            sessionStorage.setItem(`ServerList2SessionID`, SessionID)
-            sessionStorage.setItem(`ServerList2UserID`, UserID)
+            sessionStorage.setItem(`ServiceList2URL`, serverInfo2.url)
+            sessionStorage.setItem(`ServiceList2SessionID`, SessionID)
+            sessionStorage.setItem(`ServiceList2UserID`, UserID)
             console.info('session2 created', data)
         }
 
@@ -268,8 +268,8 @@
         }
 
         const LigeroAPICall = (serverInfo, action, data) => {
-            let urlField = `ServerList${serverInfo.id}URL`
-            let sessionField = `ServerList${serverInfo.id}SessionID`
+            let urlField = `ServiceList${serverInfo.id}URL`
+            let sessionField = `ServiceList${serverInfo.id}SessionID`
             data.SessionID = sessionStorage.getItem(sessionField)
             serverInfo.url = sessionStorage.getItem(urlField)
             return fetch(`${serverInfo.url}${action}`, {
@@ -280,11 +280,11 @@
                     .then(e => e.json());
         }
 
-        if(!sessionStorage.getItem('ServerList1SessionID')) {
+        if(!sessionStorage.getItem('ServiceList1SessionID')) {
             LigeroAPICreteSession(serverInfo1,saveSession1) 
         }
 
-        if(!sessionStorage.getItem('ServerList2SessionID')) {
+        if(!sessionStorage.getItem('ServiceList2SessionID')) {
             LigeroAPICreteSession(serverInfo2,saveSession2)
         }
 
@@ -372,7 +372,7 @@
 
             //mandatory fields
             Service.TypeID = 1
-            Service.UserID = sessionStorage.getItem(`ServerList${serverInfo.id}UserID`)
+            Service.UserID = sessionStorage.getItem(`ServiceList${serverInfo.id}UserID`)
             if(!Service.ParentID) {
                 Service.ParentID = 0;
             }
@@ -393,7 +393,7 @@
 
             //mandatory fields
             Service.TypeID = 1
-            Service.UserID = sessionStorage.getItem(`ServerList${serverInfo.id}UserID`)
+            Service.UserID = sessionStorage.getItem(`ServiceList${serverInfo.id}UserID`)
             if(!Service.ParentID) {
                 Service.ParentID = 0;
             }
@@ -414,19 +414,19 @@
                 Method: 'Run',
                 ReturnType: "ARRAY",
                 Params: {
-                    UserID: sessionStorage.getItem(`ServerList${serverInfo.id}UserID`)
+                    UserID: sessionStorage.getItem(`ServiceList${serverInfo.id}UserID`)
                 }
             }).then(e => console.info(e))
         }
 
         const LigeroAPIGetServices = (serverInfo) => {
-            window[`ServiceList${serverInfo.id}URL`].innerHTML = sessionStorage.getItem(`ServerList${serverInfo.id}URL`)
+            window[`ServiceList${serverInfo.id}URL`].innerHTML = sessionStorage.getItem(`ServiceList${serverInfo.id}URL`)
             return LigeroAPICall(serverInfo, '/api/v1.0/admin', {
                 Object: 'Service',
                 Method: 'ServiceListGet',
                 ReturnType: "ARRAY",
                 Params: {
-                    UserID: sessionStorage.getItem(`ServerList${serverInfo.id}UserID`)
+                    UserID: sessionStorage.getItem(`ServiceList${serverInfo.id}UserID`)
                 }
             }).then(serverInfo.FillServiceList)
         }
@@ -615,7 +615,12 @@
         }
 
         const ShowService = (event) => {
-            alert(JSON.stringify(event.target.dataset, null, 2))
+            // alert(JSON.stringify(event.target.dataset, null, 2))
+            let id = event.target.dataset.ServiceID
+            let url = sessionStorage.getItem(`${event.target.dataset.dataFrom}URL`)
+            if(url) {
+                window.open(`${url}/otrs/index.pl?Action=AdminService;Subaction=ServiceEdit;ServiceID=${id}`)
+            }
             event.stopPropagation()
         }
         const ToggleSelectService = (event) => {
