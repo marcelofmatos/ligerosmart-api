@@ -435,7 +435,7 @@
         const ServiceDragStart = (event) =>  {
             dragged = event.target
         }
-        const ServiceListDrop = async (event) => {
+        const ServiceListDrop = (event) => {
             event.preventDefault();
 
             event.target.classList.remove('dragOver')
@@ -461,7 +461,7 @@
                 }
                 if(dragged.dataset.dataFrom == 'ServiceList1') {
 
-                    await updateService(serverInfo1, dragged)
+                    updateService(serverInfo1, dragged)
                         .then( (data) => {
                             if(data.Error) {
                                 console.error(data.Error)
@@ -473,13 +473,14 @@
                             dragged.classList.add('copy')
                             dropList.appendChild(dragged)
                             sortList(dropList)
+                            compareServices()
                             dragged.scrollIntoView({block: "center", behavior: "smooth"})
                         })
                 }
                 if(dragged.dataset.dataFrom == 'ServiceList2') {
                     let liClone = dragged.cloneNode(true)
                     liClone.dataset.dataFrom = 'ServiceList1'
-                    await saveService(serverInfo1, liClone)
+                    saveService(serverInfo1, liClone)
                         .then( (data) => {
                             if(data.Error) {
                                 let message = `${data.Error} (${liClone.dataset.NameShort})`
@@ -497,6 +498,7 @@
                             liClone.classList.add('copy')
                             dropList.appendChild(liClone)
                             sortList(dropList)
+                            compareServices()
                             liClone.scrollIntoView({block: "center", behavior: "smooth"})
 
                             if(copySubServiceTree.value) {
@@ -510,7 +512,6 @@
                 }
 
             }
-            compareServices();
             return true
         }
 
