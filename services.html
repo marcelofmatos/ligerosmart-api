@@ -270,12 +270,8 @@
         const LigeroAPICall = (serverInfo, action, data) => {
             let urlField = `ServerList${serverInfo.id}URL`
             let sessionField = `ServerList${serverInfo.id}SessionID`
-            if(!data['SessionID']) {
-                data['SessionID'] = sessionStorage.getItem(sessionField)
-            }
-            if(!serverInfo.url) {
-                serverInfo.url = sessionStorage.getItem(urlField)
-            }
+            data.SessionID = sessionStorage.getItem(sessionField)
+            serverInfo.url = sessionStorage.getItem(urlField)
             return fetch(`${serverInfo.url}${action}`, {
                         method: "POST",
                         // headers: {"Content-type": "application/json; charset=UTF-8"}, // CORS header error
@@ -376,7 +372,7 @@
 
             //mandatory fields
             Service.TypeID = 1
-            Service.UserID = sessionStorage.getItem(`ServiceList${serverInfo.id}UserID`)
+            Service.UserID = sessionStorage.getItem(`ServerList${serverInfo.id}UserID`)
             if(!Service.ParentID) {
                 Service.ParentID = 0;
             }
