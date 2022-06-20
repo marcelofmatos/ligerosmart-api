@@ -234,15 +234,17 @@
 
         const saveSession1 = (data) => {
             let { SessionID, UserID } = data
-            sessionStorage.setItem(`SessionID1`, SessionID)
-            sessionStorage.setItem(`UserID1`, UserID)
+            sessionStorage.setItem(`ServerList1URL`, serverInfo1.url)
+            sessionStorage.setItem(`ServerList1SessionID`, SessionID)
+            sessionStorage.setItem(`ServerList1UserID`, UserID)
             console.info('session1 created', data)
         }
 
         const saveSession2 = (data) => {
             let { SessionID, UserID } = data
-            sessionStorage.setItem(`SessionID2`, SessionID)
-            sessionStorage.setItem(`UserID2`, UserID)
+            sessionStorage.setItem(`ServerList2URL`, serverInfo2.url)
+            sessionStorage.setItem(`ServerList2SessionID`, SessionID)
+            sessionStorage.setItem(`ServerList2UserID`, UserID)
             console.info('session2 created', data)
         }
 
@@ -260,11 +262,15 @@
         }
 
         const LigeroAPICall = (serverInfo, action, data) => {
-            let field = `SessionID${serverInfo.id}`
+            let urlField = `ServerList${serverInfo.id}URL`
+            let sessionField = `ServerList${serverInfo.id}SessionID`
             if(!data['SessionID']) {
-                data['SessionID'] = sessionStorage.getItem(field)
+                data['SessionID'] = sessionStorage.getItem(sessionField)
             }
-            return fetch(`${serverInfo.url}${action}`, { 
+            if(!serverInfo.url) {
+                serverInfo.url = sessionStorage.getItem(urlField)
+            }
+            return fetch(`${serverInfo.url}${action}`, {
                         method: "POST",
                         // headers: {"Content-type": "application/json; charset=UTF-8"}, // CORS header error
                         body: JSON.stringify(data),
@@ -272,11 +278,11 @@
                     .then(e => e.json());
         }
 
-        if(!sessionStorage.getItem('SessionID1')) {
+        if(!sessionStorage.getItem('ServerList1SessionID')) {
             LigeroAPICreteSession(serverInfo1,saveSession1) 
         }
 
-        if(!sessionStorage.getItem('SessionID2')) {
+        if(!sessionStorage.getItem('ServerList2SessionID')) {
             LigeroAPICreteSession(serverInfo2,saveSession2)
         }
 
@@ -709,7 +715,21 @@
             LigeroAPIGetServices(serverInfo2)
         }
 
-        window.addEventListener('load',() => getAllServices)
+        window.addEventListener('load',() => {
+            getAllServices()
+            if(sessionStorage.getItem('SessionID1')) {
+                LigeroAPIGetServices(serverInfo1)
+            }
+            if(sessionStorage.getItem('SessionID2')) {
+                LigeroAPIGetServices(serverInfo2)
+            }
+        })
+        ServiceList2.addEventListener('drop', (event) => {
+            event.stopPropagation()
+            event.preventDefault()
+            alert('read-only side')
+            return false
+        })
 
     </script>
 </html>
