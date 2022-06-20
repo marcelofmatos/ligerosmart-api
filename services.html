@@ -435,7 +435,7 @@
         const ServiceDragStart = (event) =>  {
             dragged = event.target
         }
-        const ServiceListDrop = (event) => {
+        const ServiceListDrop = async (event) => {
             event.preventDefault();
 
             event.target.classList.remove('dragOver')
@@ -461,7 +461,7 @@
                 }
                 if(dragged.dataset.dataFrom == 'ServiceList1') {
 
-                    updateService(serverInfo1, dragged)
+                    await updateService(serverInfo1, dragged)
                         .then( (data) => {
                             if(data.Error) {
                                 console.error(data.Error)
@@ -479,7 +479,7 @@
                 if(dragged.dataset.dataFrom == 'ServiceList2') {
                     let liClone = dragged.cloneNode(true)
                     liClone.dataset.dataFrom = 'ServiceList1'
-                    saveService(serverInfo1, liClone)
+                    await saveService(serverInfo1, liClone)
                         .then( (data) => {
                             if(data.Error) {
                                 let message = `${data.Error} (${liClone.dataset.NameShort})`
