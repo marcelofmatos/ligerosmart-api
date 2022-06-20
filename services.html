@@ -212,7 +212,7 @@
                 if(data.Error) {
                     console.error(data.Error)
                     if(data.Error.ErrorCode == "TicketCreate.AuthFail") {
-                        sessionStorage.removeItem(`SessionID1`)
+                        sessionStorage.removeItem(`ServerList1SessionID`)
                     }
                 }
                 data.Result[0].forEach(createServiceItem1)
@@ -229,7 +229,7 @@
                 if(data.Error) {
                     console.error(data.Error)
                     if(data.Error.ErrorCode == "TicketCreate.AuthFail") {
-                        sessionStorage.removeItem(`SessionID2`)
+                        sessionStorage.removeItem(`ServerList2SessionID`)
                     }
                 }
                 data.Result[0].forEach(createServiceItem2)
@@ -397,7 +397,7 @@
 
             //mandatory fields
             Service.TypeID = 1
-            Service.UserID = sessionStorage.getItem(`ServiceList${serverInfo.id}UserID`)
+            Service.UserID = sessionStorage.getItem(`ServerList${serverInfo.id}UserID`)
             if(!Service.ParentID) {
                 Service.ParentID = 0;
             }
@@ -418,7 +418,7 @@
                 Method: 'Run',
                 ReturnType: "ARRAY",
                 Params: {
-                    UserID: sessionStorage.getItem(`ServiceList${serverInfo.id}UserID`)
+                    UserID: sessionStorage.getItem(`ServerList${serverInfo.id}UserID`)
                 }
             }).then(e => console.info(e))
         }
@@ -430,7 +430,7 @@
                 Method: 'ServiceListGet',
                 ReturnType: "ARRAY",
                 Params: {
-                    UserID: sessionStorage.getItem(`ServiceList${serverInfo.id}UserID`)
+                    UserID: sessionStorage.getItem(`ServerList${serverInfo.id}UserID`)
                 }
             }).then(serverInfo.FillServiceList)
         }
