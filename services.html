@@ -478,6 +478,7 @@
                 }
                 if(dragged.dataset.dataFrom == 'ServiceList2') {
                     let liClone = dragged.cloneNode(true)
+                    liClone.dataset.dataFrom = 'ServiceList1'
                     saveService(serverInfo1, dragged)
                         .then( (data) => {
                             if(data.Error) {
