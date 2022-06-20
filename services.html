@@ -420,7 +420,7 @@
         }
 
         const LigeroAPIGetServices = (serverInfo) => {
-            window[`ServiceList${serverInfo.id}URL`].innerHTML = serverInfo.url
+            window[`ServiceList${serverInfo.id}URL`].innerHTML = sessionStorage.getItem(`ServerList${serverInfo.id}URL`)
             return LigeroAPICall(serverInfo, '/api/v1.0/admin', {
                 Object: 'Service',
                 Method: 'ServiceListGet',
