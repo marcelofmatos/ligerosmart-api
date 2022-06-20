@@ -376,7 +376,7 @@
 
             //mandatory fields
             Service.TypeID = 1
-            Service.UserID = sessionStorage.getItem(`UserID${serverInfo.id}`)
+            Service.UserID = sessionStorage.getItem(`ServiceList${serverInfo.id}UserID`)
             if(!Service.ParentID) {
                 Service.ParentID = 0;
             }
@@ -397,7 +397,7 @@
 
             //mandatory fields
             Service.TypeID = 1
-            Service.UserID = sessionStorage.getItem(`UserID${serverInfo.id}`)
+            Service.UserID = sessionStorage.getItem(`ServiceList${serverInfo.id}UserID`)
             if(!Service.ParentID) {
                 Service.ParentID = 0;
             }
@@ -418,7 +418,7 @@
                 Method: 'Run',
                 ReturnType: "ARRAY",
                 Params: {
-                    UserID: sessionStorage.getItem(`UserID${serverInfo.id}`)
+                    UserID: sessionStorage.getItem(`ServiceList${serverInfo.id}UserID`)
                 }
             }).then(e => console.info(e))
         }
@@ -430,7 +430,7 @@
                 Method: 'ServiceListGet',
                 ReturnType: "ARRAY",
                 Params: {
-                    UserID: sessionStorage.getItem(`UserID${serverInfo.id}`)
+                    UserID: sessionStorage.getItem(`ServiceList${serverInfo.id}UserID`)
                 }
             }).then(serverInfo.FillServiceList)
         }
