@@ -1004,8 +1004,8 @@
                   if(service.ServiceID) {
                       ParentID = service.ServiceID
                   } else {
-                      reload = !ParentID
                       response = await saveService(serverInfo1, serviceTemplate)
+                      reload = Boolean(response.Result && response.Result.length)
                       ServicesByName.push({
                           ServiceID: response.Result[0],
                           Name: serviceTemplate.Name,
