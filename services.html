@@ -754,8 +754,8 @@
                   serverInfo1.userLogin = loginConnection1UserLogin.value
                   serverInfo1.userPassword = loginConnection1UserPassword.value
                   await LigeroAPICreteSession(serverInfo1,saveSession1)
-                  await LigeroAPIGetServices(serverInfo1)
                   span.click()
+                  LigeroAPIGetServices(serverInfo1)
               }
   
   
@@ -794,8 +794,8 @@
                   serverInfo2.userLogin = loginConnection2UserLogin.value
                   serverInfo2.userPassword = loginConnection2UserPassword.value
                   await LigeroAPICreteSession(serverInfo2,saveSession2)
-                  await LigeroAPIGetServices(serverInfo2)
                   span.click()
+                  LigeroAPIGetServices(serverInfo2)
               }
   
   
