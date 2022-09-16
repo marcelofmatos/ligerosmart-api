@@ -5,6 +5,8 @@
     <!-- Compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
 
+    <script src="xlsx.full.min.js"></script>
+
     <!-- Compiled and minified JavaScript -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
        
@@ -26,6 +28,8 @@
                 min-height: 30px;
                 width: 100%;
                 padding: 15px;
+                position: sticky;
+                top: 0;
             }
             .ServiceList li {
                 padding: 10px;
@@ -35,13 +39,13 @@
             }
 
             #ServiceList1, #ServiceList2 {
-                height: 82%;
+                height: 77%;
                 overflow-y: scroll;
             }
 
-            .ServiceList .copy {
-                /* background-color: rgb(149, 197, 185); */
-            }
+            /* .ServiceList .copy {
+                background-color: rgb(149, 197, 185);
+            } */
 
             .ServiceActions button {
                 display: block;
@@ -101,30 +105,46 @@
                 text-decoration: none;
                 cursor: pointer;
             }
+            .progressBar {
+                width: 100%;
+                display: none;
+            }
+
+            .progressBar.show {
+                display: inline !important;
+            }
+
+            #file {
+                display: none;
+            }
+
         </style>
     </head>
-    <body>
+    <body class="keyboard-focused">
         
         <div id="Services" class="row">
             <div class="col s5">
                 <nav class="navbar navbar-dark default-color">
                     <ul id="Menu1Actions" class="navbar-nav mr-auto">
                         <li class="navbar-item"><a href="#" class="navbar-link" onclick="connectionModal1(serverInfo1)"> Conectar </a></li>
+                        <li class="navbar-item"><a href="#" class="navbar-link" onclick="loadSpreadSheet()"> Abrir planilha</a></li>
+                        <!-- <li class="navbar-item"><a href="#" class="navbar-link" onclick="testResult()"> testResult </a></li> -->
+                        <li class="navbar-item"><a href="#" class="navbar-link" onclick="loadServicesFromFile()"> Carregar da planilha</a></li>
                         <li class="navbar-item"><a href="#" class="navbar-link" onclick="sortList(ServiceList1)"> Ordenar </a></li>
                         <li class="navbar-item"><a href="#" class="navbar-link" onclick="cleanCache(serverInfo1)"> Limpar cache </a></li>
                     </ul> 
                 </nav>
                 <h2 id="ServiceList1URL"></h2>
-                <ul id="ServiceList1" class="ServiceList Root">
-                </ul> 
+                <progress id="ServiceList1ProgressBar" class="progressBar"></progress>
+                <ul id="ServiceList1" class="ServiceList Root"></ul> 
             </div>
             <div class="col s1 ServiceActions">
                 <!-- <nav class="navbar flex-column nav-pills" aria-orientation="vertical"> -->
                     <ul id="MenuActions">
-                        <li class="navbar-item"><a href="#" class="navbar-link" onclick="getAllServices()" />Get Services</a></li>
-                        <li class="navbar-item"><a href="#" class="navbar-link" onclick="copyTo2(event)"> >> copiar </a></li>
-                        <li class="navbar-item"><a href="#" class="navbar-link" onclick="copyTo1(event)"> << copiar </a></li>
-                        <input type="checkbox" id="copySubServiceTree" name="copySubServiceTree" />
+                        <li class="navbar-item"><a href="#" class="navbar-link" onclick="getAllServices()">Get Services</a></li>
+                        <li class="navbar-item"><a href="#" class="navbar-link" onclick="copyTo2(event)"> &gt;&gt; copiar </a></li>
+                        <li class="navbar-item"><a href="#" class="navbar-link" onclick="copyTo1(event)"> &lt;&lt; copiar </a></li>
+                        <input type="checkbox" id="copySubServiceTree" name="copySubServiceTree">
                     </ul> 
                 <!-- </nav> -->
             </div>
@@ -137,8 +157,8 @@
                     </ul> 
                 </nav>
                 <h2 id="ServiceList2URL"></h2>
-                <ul id="ServiceList2" class="ServiceList Root">
-                </ul> 
+                <progress id="ServiceList2ProgressBar" class="progressBar"></progress>
+                <ul id="ServiceList2" class="ServiceList Root"></ul> 
             </div>
         </div>
 
@@ -147,12 +167,12 @@
 
         <!-- Modal content -->
         <div class="modal-content">
-        <span class="close">&times;</span>
+        <span class="close">×</span>
         <form onsubmit="return false" action="" method="POST">
             <div>
-                URL: <input type="text" name="url"/>
-                Usuário: <input type="text" name="user"/>
-                Senha: <input type="text" name="password"/>
+                URL: <input type="text" name="url">
+                Usuário: <input type="text" name="user">
+                Senha: <input type="text" name="password">
                 <button class="testConnection">Conectar</button>
             </div>
         </form>
@@ -167,15 +187,16 @@
 
         <!-- Modal content -->
         <div class="modal-content">
-            <span class="close">&times;</span>
+            <span class="close">×</span>
             <h2>Service List 1</h2>
             <form id="formConnection1" onsubmit="return false" action="" method="POST">
                 <div>
-                    URL: <input type="text" name="url" id="loginConnection1URL" />
-                    Usuário: <input type="text" name="user" id="loginConnection1UserLogin" />
-                    Senha: <input type="password" name="password" id="loginConnection1UserPassword" />
+                    URL: <input type="text" name="url" id="loginConnection1URL">
+                    Usuário: <input type="text" name="user" id="loginConnection1UserLogin" value="root@localhost">
+                    Senha: <input type="password" name="password" id="loginConnection1UserPassword">
                     <button class="testConnection">Conectar</button>
                 </div>
+                <progress class="progressBar"></progress>
             </form>
         </div>
     
@@ -186,21 +207,24 @@
 
         <!-- Modal content -->
         <div class="modal-content">
-            <span class="close">&times;</span>
+            <span class="close">×</span>
             <h2>Service List 2</h2>
             <form id="formConnection2" onsubmit="return false" action="" method="POST">
                 <div>
-                    URL: <input type="text" name="url" id="loginConnection2URL" />
-                    Usuário: <input type="text" name="user" id="loginConnection2UserLogin" />
-                    Senha: <input type="password" name="password" id="loginConnection2UserPassword" />
+                    URL: <input type="text" name="url" id="loginConnection2URL">
+                    Usuário: <input type="text" name="user" id="loginConnection2UserLogin" value="root@localhost">
+                    Senha: <input type="password" name="password" id="loginConnection2UserPassword">
                     <button class="testConnection">Conectar</button>
                 </div>
+                <progress class="progressBar"></progress>
             </form>
         </div>
     
     </div>
     
-    </body>
+    <input type="file" id="file" />
+    <div id="result"></div>    
+    
     <script>
 
         var serverInfo1 = {
@@ -223,8 +247,8 @@
         var serverInfo2 = {
             id: 2,
             url: "",
-            userLogin: "root@localhost",
-            userPassword: "ligero",
+            userLogin: "",
+            userPassword: "",
             FillServiceList: (data) => {
                 if(data.Error) {
                     console.error(data.Error)
@@ -240,18 +264,20 @@
 
         const saveSession1 = (data) => {
             let { SessionID, UserID } = data
-            sessionStorage.setItem(`ServiceList1URL`, serverInfo1.url)
+            sessionStorage.setItem(`ServiceList1URL`, serverInfo1.url || '')
             sessionStorage.setItem(`ServiceList1SessionID`, SessionID)
             sessionStorage.setItem(`ServiceList1UserID`, UserID)
             console.info('session1 created', data)
+            loginModal1.querySelector('.progressBar').style.display = 'none';
         }
 
         const saveSession2 = (data) => {
             let { SessionID, UserID } = data
-            sessionStorage.setItem(`ServiceList2URL`, serverInfo2.url)
+            sessionStorage.setItem(`ServiceList2URL`, serverInfo2.url || '')
             sessionStorage.setItem(`ServiceList2SessionID`, SessionID)
             sessionStorage.setItem(`ServiceList2UserID`, UserID)
             console.info('session2 created', data)
+            loginModal2.querySelector('.progressBar').style.display = 'none';
         }
 
         const LigeroAPICreteSession = (serverInfo,saveSession) => {
@@ -303,6 +329,7 @@
             }
             li.dataset.dataFrom = 'ServiceList1'
             li.innerHTML = Service.NameShort
+            li.title = Service.Name
             // li.title = Service.Name
             li.draggable = true
             if(Service.ParentID) {
@@ -342,6 +369,7 @@
             }
             li.dataset.dataFrom = 'ServiceList2'
             li.innerHTML = Service.NameShort
+            li.title = Service.Name
             // li.innerHTML = Service.Name
             li.draggable = true
             if(Service.ParentID) {
@@ -368,7 +396,7 @@
 
         const saveService = (serverInfo, obj) => {
 
-            let Service = Object.assign({}, obj.dataset)
+            let Service = obj.dataset ? Object.assign({}, obj.dataset) : obj
 
             //mandatory fields
             Service.TypeID = 1
@@ -384,6 +412,45 @@
                 Method: 'ServiceAdd',
                 ReturnType: "ARRAY",
                 Params: Service,
+            })
+        }
+
+
+        const saveServicePreferencesGet = (serverInfo, Params) => {
+
+            // Params {
+            // ServiceID => 123,
+            // UserID    => 123,
+            // }
+
+            //mandatory fields
+            Params.UserID = sessionStorage.getItem(`ServiceList${serverInfo.id}UserID`)
+
+            return LigeroAPICall(serverInfo, '/api/v1.0/admin', {
+                Object: 'Service',
+                Method: 'ServicePreferencesGet',
+                ReturnType: "ARRAY",
+                Params,
+            })
+        }
+
+        const saveServicePreferencesSet = (serverInfo, Params) => {
+
+            // Params {
+            // ServiceID => 123,
+            // Key       => 'UserComment',
+            // Value     => 'some comment',
+            // UserID    => 123,
+            // }
+
+            //mandatory fields
+            Params.UserID = sessionStorage.getItem(`ServiceList${serverInfo.id}UserID`)
+
+            return LigeroAPICall(serverInfo, '/api/v1.0/admin', {
+                Object: 'Service',
+                Method: 'ServicePreferencesSet',
+                ReturnType: "ARRAY",
+                Params,
             })
         }
 
@@ -429,6 +496,25 @@
                     UserID: sessionStorage.getItem(`ServiceList${serverInfo.id}UserID`)
                 }
             }).then(serverInfo.FillServiceList)
+        }
+
+
+        const LigeroAPIFindService = (serverInfo, ServiceObjectSearch) => {
+            window[`ServiceList${serverInfo.id}URL`].innerHTML = sessionStorage.getItem(`ServiceList${serverInfo.id}URL`)
+            ServiceObjectSearch.UserID = sessionStorage.getItem(`ServiceList${serverInfo.id}UserID`)
+            
+            list = Array.from(window[`ServiceList${serverInfo.id}`].querySelectorAll('li.RootService, li.ChildService'))
+            service = list.find(item => item.dataset.Name.trim() === ServiceObjectSearch.Name.trim() && item.ServiceID)
+            // service = {}
+
+            return service 
+                    ? Object.assign({}, service.dataset)
+                    : LigeroAPICall(serverInfo, '/api/v1.0/admin', {
+                            Object: 'Service',
+                            Method: 'ServiceGet',
+                            ReturnType: "HASH",
+                            Params: ServiceObjectSearch
+                        }).then(response => response.Result)
         }
 
 
@@ -663,6 +749,7 @@
                 loginModal1.style.display = "none";
             }
             testConnection.onclick = async function() {
+                loginModal1.querySelector('.progressBar').style.display = 'inline';
                 serverInfo1.url = loginConnection1URL.value
                 serverInfo1.userLogin = loginConnection1UserLogin.value
                 serverInfo1.userPassword = loginConnection1UserPassword.value
@@ -702,6 +789,7 @@
                 loginModal2.style.display = "none";
             }
             testConnection.onclick = async function() {
+                loginModal2.querySelector('.progressBar').style.display = 'inline';
                 serverInfo2.url = loginConnection2URL.value
                 serverInfo2.userLogin = loginConnection2UserLogin.value
                 serverInfo2.userPassword = loginConnection2UserPassword.value
@@ -760,4 +848,202 @@
         })
 
     </script>
-</html>
+
+<script>
+    
+    // Set custom key if the file is structured to array of objects
+    let jrexKeyName = 'Aplicação'
+    // This variable will contain xlsx data
+    let jrexXlsData = []
+
+    // jrexInitialize(document.getElementById('file').files[0])
+
+    /**
+     * Initialize JREX and load XLS file from the specified file.
+     * 
+     * @return void
+     */
+    async function jrexInitialize() {
+        const file = document.getElementById('file').files[0]
+        const reader = new FileReader
+        reader.addEventListener('load', (event) => {
+            console.log(event.target.result)
+            const jrexRequestData = new Uint8Array(event.target.result)
+            const jrexWorkbook = XLSX.read(jrexRequestData, { type: 'array' })
+
+            jrexWorkbook.SheetNames.forEach(function (sheetName) {
+                jrexXlsData = XLSX.utils.sheet_to_row_object_array(jrexWorkbook.Sheets[sheetName])
+            })
+        })
+        reader.readAsArrayBuffer(file)
+    }
+    /**
+     * Handle jrex input change.
+     * 
+     * @param {DomEvent} e
+     * @return void
+     */
+    function jrexInputChanged(e) {
+        const jrexInputValue = e.target.value
+        let jrexFinds = jrexXlsData.find(item => item[jrexKeyName].toString().match(jrexInputValue))
+
+        if (jrexFinds !== undefined) {
+            jrexOutput.innerText = JSON.stringify(jrexFinds)
+            // Logic
+        } else {
+            jrexOutput.innerText = 'not found'
+        }
+    }
+
+    async function testResult() {
+
+        try {
+            if(document.querySelector('#file').files.length === 0) {
+                console.error('File not loaded')
+                throw('File not loaded')
+                return false
+            }
+    
+            await jrexInitialize()
+            alert(JSON.stringify(jrexXlsData[0],null,'\t'))
+            // alert(JSON.stringify(serviceTemplate,null,'\t'))
+            
+        } catch (error) {
+            alert(error)
+        }
+    }
+
+    var serviceTemplate = {
+        "Name": "Let",
+        "NameShort": "Let",
+        "Criticality": "1 very low",
+        "TicketQueue": "",
+        "Forms": "",
+        "CurInciStateType": "operational",
+        "Icons": "fas fa-cog",
+        "CurInciState": "Operational",
+        "Type": "Back End",
+        "CreateTime": "2022-07-13 11:26:15",
+        "ChangeTime": "2022-07-13 11:27:51",
+        "ServiceID": "",
+        "ValidID": "1",
+        "TicketType": "",
+        "ServiceImageBackground": "",
+        "ChangeBy": "1",
+        "CreateBy": "1",
+        "TicketQueueExpression": "",
+        "CurInciStateTypeFromCIs": "operational",
+        "CurInciStateID": "1",
+        "TypeID": "6",
+        "DefaultService": "1",
+        "Icons": "fas fa-cog",
+    }
+
+
+async function loadServicesFromFile() {
+
+    try {
+        
+
+        if(document.querySelector('#file').files.length === 0) {
+            console.error('File not loaded')
+            alert('File not loaded')
+            return false
+        }
+
+        let reload = false
+        let ServicesByName = []
+        Array.from(window[`ServiceList1`]
+            .querySelectorAll('li.RootService, li.ChildService')).forEach(item => {
+                let service = Object.assign({}, item.dataset)
+                ServicesByName.push(service)
+            })
+
+        ServiceList1ProgressBar.classList.add('show')
+
+        ServiceList1ProgressBar.max = jrexXlsData.length
+
+        for(let item of jrexXlsData) {
+
+            if(reload) {
+                await LigeroAPIGetServices(serverInfo1)
+                reload = false
+            }
+
+            console.log(item['__rowNum__'])
+
+            ServiceList1ProgressBar.value = item['__rowNum__']
+
+            let ParentID = null
+            let lastValue = null
+            serviceTemplate.Name = ''
+            serviceTemplate.NameShort = ''
+
+
+            for(let [key,value] of Object.entries(item)) {
+                console.log({ key,value })
+
+                // if(value == '')   continue
+                if(!value)           continue
+                if(value == 'N/A')   continue
+                if(key == 'Cliente') continue
+                // if(lastValue !== null && value === lastValue) continue
+
+                serviceTemplate.NameShort = value.trim()
+                lastValue = value.trim()
+                if(serviceTemplate.Name === '') {
+                    serviceTemplate.Name = value.trim()
+                } else {
+                    serviceTemplate.Name += '::' + value.trim()
+                }
+                serviceTemplate.ParentID = ParentID
+                // service = ServicesByName.find(e => e.Name === serviceTemplate.Name && e.ServiceID) || await LigeroAPIFindService(serverInfo1, { Name: serviceTemplate.Name.trim() })
+                service = await LigeroAPIFindService(serverInfo1, { Name: serviceTemplate.Name.trim() })
+                if(service.ServiceID) {
+                    ParentID = service.ServiceID
+                } else {
+                    reload = !ParentID
+                    response = await saveService(serverInfo1, serviceTemplate)
+                    ServicesByName.push({
+                        ServiceID: response.Result[0],
+                        Name: serviceTemplate.Name,
+                    })
+                    ParentID = response.Result[0]
+                    if(!ParentID) { 
+                        console.warn({ ParentID, response, serviceTemplate })
+                        // debugger
+                        // return false
+                    }
+                }
+
+            }
+                
+        }
+   
+    } catch (error) {
+        console.error(error)
+        file = document.querySelector('#file').files[0].name
+        line = ServiceList1ProgressBar.value
+        alert(`Planilha: ${file}\nLinha: ${line}\nErro: ${error}`)
+    }
+
+    ServiceList1ProgressBar.classList.remove('show')
+
+    await LigeroAPIGetServices(serverInfo1)
+
+}
+
+
+const loadSpreadSheet = () => {
+    document.getElementById('file').click()
+}
+
+document.querySelector('#file').addEventListener('input', async () => {
+    await jrexInitialize()
+})
+
+
+
+
+</script>
+</body></html>
