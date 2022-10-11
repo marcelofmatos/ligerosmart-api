@@ -291,7 +291,9 @@
                 .then(e => e.json())
                 .then(saveSession)
                 .catch(e => {
-                    alert(e)
+                    if(!e.message.match(/JSON[.]parse/)){
+                        alert(e)
+                    }
                     console.error(e)
                 })
           }
