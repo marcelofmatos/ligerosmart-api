@@ -291,7 +291,8 @@
                 .then(e => e.json())
                 .then(saveSession)
                 .catch(e => {
-                    if(!e.message.match(/JSON[.]parse/)){
+                    let sessionField = `ServiceList${serverInfo.id}SessionID`
+                    if(sessionStorage.getItem(sessionField)){
                         alert(e)
                     }
                     console.error(e)
