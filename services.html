@@ -318,7 +318,9 @@
                 })
                 .then(e => e.json ? e.json() : e.text() )
                 .catch(e => {
-                    alert(`API call error: ${e.message}`)
+                    if(sessionStorage.getItem(sessionField)){
+                        alert(`API call error: ${e.message}`)
+                    }
                     console.error(e)
                 })
           }
