@@ -290,7 +290,7 @@
                 })
                 .then(e => e.json())
                 .then(saveSession)
-                .catch(e => () => {
+                .catch(e => (e) => {
                     alert(e)
                     console.error(e)
                 })
@@ -307,7 +307,7 @@
                           body: JSON.stringify(data),
                 })
                 .then(e => e.json ? e.json() : e.text() )
-                .catch(e => () => {
+                .catch(e => (e) => {
                     console.error(e)
                 })
           }
