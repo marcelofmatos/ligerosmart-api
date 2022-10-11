@@ -235,6 +235,7 @@
               FillServiceList: (data) => {
                 if(data) {
                   if(data.Error) {
+                      alert(data.Error.ErrorMessage)
                       console.error(data.Error)
                       if(data.Error.ErrorCode == "TicketCreate.AuthFail") {
                           sessionStorage.removeItem(`ServiceList1SessionID`)
@@ -255,6 +256,7 @@
               FillServiceList: (data) => {
                 if(data) {
                   if(data.Error) {
+                      alert(data.Error.ErrorMessage)
                       console.error(data.Error)
                       if(data.Error.ErrorCode == "TicketCreate.AuthFail") {
                           sessionStorage.removeItem(`ServiceList2SessionID`)
