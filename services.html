@@ -287,10 +287,13 @@
                           method: "POST",
                           // headers: {"Content-type": "application/json; charset=UTF-8"},
                           body: JSON.stringify({ UserLogin, Password }),
-                      })
-                  .then(e => e.json())
-                  .then(saveSession)
-                  .catch(e => console.error(e))
+                })
+                .then(e => e.json())
+                .then(saveSession)
+                .catch(e => () => {
+                    alert(e)
+                    console.error(e)
+                })
           }
   
           const LigeroAPICall = (serverInfo, action, data) => {
@@ -302,8 +305,11 @@
                           method: "POST",
                           // headers: {"Content-type": "application/json; charset=UTF-8"}, // CORS header error
                           body: JSON.stringify(data),
-                      })
-                      .then(e => e.json());
+                })
+                .then(e => e.json ? e.json() : e.text() )
+                .catch(e => () => {
+                    console.error(e)
+                })
           }
   
           if(!sessionStorage.getItem('ServiceList1SessionID')) {
