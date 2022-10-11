@@ -233,7 +233,8 @@
               userLogin: "root@localhost",
               userPassword: "ligero",
               FillServiceList: (data) => {
-                  if(data && data.Error) {
+                if(data) {
+                  if(data.Error) {
                       console.error(data.Error)
                       if(data.Error.ErrorCode == "TicketCreate.AuthFail") {
                           sessionStorage.removeItem(`ServiceList1SessionID`)
@@ -241,6 +242,8 @@
                   }
                   data.Result[0].forEach(createServiceItem1)
                   compareServices()
+
+                }
               }
           }
   
@@ -250,7 +253,8 @@
               userLogin: "",
               userPassword: "",
               FillServiceList: (data) => {
-                  if(data && data.Error) {
+                if(data) {
+                  if(data.Error) {
                       console.error(data.Error)
                       if(data.Error.ErrorCode == "TicketCreate.AuthFail") {
                           sessionStorage.removeItem(`ServiceList2SessionID`)
@@ -258,6 +262,7 @@
                   }
                   data.Result[0].forEach(createServiceItem2)
                   compareServices()
+                }
               }
           }
   
